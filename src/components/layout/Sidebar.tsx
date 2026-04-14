@@ -1,6 +1,7 @@
 import { TrendingUp, PieChart, Activity, Settings, LayoutDashboard, Wallet, LogOut } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useState } from 'react';
+import { useAuth } from '../../lib/AuthContext';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', active: true },
@@ -11,6 +12,7 @@ const navItems = [
 
 export function Sidebar() {
   const [activeTab, setActiveTab] = useState('Dashboard');
+  const { logout, isAuthenticated } = useAuth();
 
   return (
     <aside className="w-64 h-screen border-r border-white/10 glass flex flex-col hidden md:flex sticky top-0">
@@ -46,10 +48,12 @@ export function Sidebar() {
           <Settings className="w-5 h-5" />
           <span className="font-medium">Settings</span>
         </button>
-        <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors mt-2">
-          <LogOut className="w-5 h-5" />
-          <span className="font-medium">Logout</span>
-        </button>
+        {isAuthenticated && (
+          <button onClick={logout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors mt-2">
+            <LogOut className="w-5 h-5" />
+            <span className="font-medium">Logout</span>
+          </button>
+        )}
       </div>
     </aside>
   );

@@ -184,7 +184,108 @@ export interface LoginRequest {
   password?: string;
 }
 
+// ======================= FAVOURITE STOCKS ENDPOINTS =======================
+
+export async function getFavouriteStocks(): Promise<StockTrackingInfo[]> {
+  const token = localStorage.getItem('auth_token');
+  if (!token) throw new Error("Unauthorized");
+  
+  const response = await fetch(`${API_BASE_URL}/protected/stocks/favourite`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  
+  const json = await response.json();
+  if (!response.ok || (json?.code && json.code !== 'SUCCESS')) {
+    throw new ApiError(json?.message || 'Failed to fetch favourite stocks', json?.code);
+  }
+  
+  const list = json?.data || [];
+  
+  const promises = list.map(async (item: any) => {
+    const sym = item.symbol || (item.stock_info && item.stock_info.symbol) || item.StockInfo?.Symbol;
+    if (sym) {
+      const rtStock = await fetchStockInfo(sym);
+      if (rtStock) return rtStock;
+    }
+    
+    // Fallback if real-time fetch fails
+    const raw = item.stock_info || item.StockInfo || {};
+    return scalePrices({
+      stockSymbol: sym || '',
+      companyNameEn: raw.company_name_en || raw.CompanyNameEn || '',
+      companyNameVi: raw.company_name_vi || raw.CompanyNameVi || '',
+      exchange: raw.exchange || raw.Exchange || '',
+      matchedPrice: 0,
+      priceChange: 0,
+      priceChangePercent: 0,
+      nmTotalTradedValue: 0,
+    } as any);
+  });
+
+  return Promise.all(promises);
+}
+
+export async function getFavouriteSymbols(): Promise<string[]> {
+  const token = localStorage.getItem('auth_token');
+  if (!token) return [];
+  
+  const response = await fetch(`${API_BASE_URL}/protected/stocks/favourite`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  
+  const json = await response.json();
+  if (!response.ok || (json?.code && json.code !== 'SUCCESS')) {
+    return [];
+  }
+  
+  const list = json?.data || [];
+  return list.map((item: any) => item.symbol || (item.stock_info && item.stock_info.symbol) || item.StockInfo?.Symbol || '');
+}
+
+export async function removeFavouriteStock(symbol: string): Promise<void> {
+  const token = localStorage.getItem('auth_token');
+  if (!token) throw new Error("Unauthorized");
+  
+  const response = await fetch(`${API_BASE_URL}/protected/stocks/favourite/${symbol}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  
+  const json = await response.json();
+  if (!response.ok || (json?.code && json.code !== 'SUCCESS')) {
+    throw new ApiError(json?.message || 'Failed to remove favourite stock', json?.code);
+  }
+}
+
+export async function addFavouriteStock(symbol: string): Promise<void> {
+  const token = localStorage.getItem('auth_token');
+  if (!token) throw new Error("Unauthorized");
+  
+  const response = await fetch(`${API_BASE_URL}/protected/stocks/favourite`, {
+    method: 'POST',
+    headers: { 
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json' 
+    },
+    body: JSON.stringify({ symbol })
+  });
+  
+  const json = await response.json();
+  if (!response.ok || (json?.code && json.code !== 'SUCCESS')) {
+    throw new ApiError(json?.message || 'Failed to add favourite stock', json?.code);
+  }
+}
+
 // ======================= AUTH ENDPOINTS =======================
+
+export class ApiError extends Error {
+  code?: string;
+  constructor(message: string, code?: string) {
+    super(message);
+    this.code = code;
+    this.name = 'ApiError';
+  }
+}
 
 export async function loginUser(req: LoginRequest): Promise<AuthResponse> {
   const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -194,8 +295,8 @@ export async function loginUser(req: LoginRequest): Promise<AuthResponse> {
   });
   
   const json = await response.json();
-  if (!response.ok || json?.code !== 'SUCCESS') {
-    throw new Error(json?.message || 'Login failed');
+  if (!response.ok || (json?.code && json.code !== 'SUCCESS')) {
+    throw new ApiError(json?.message || 'Login failed', json?.code);
   }
   return json.data;
 }
@@ -208,8 +309,8 @@ export async function registerUser(req: RegisterRequest): Promise<User> {
   });
 
   const json = await response.json();
-  if (!response.ok || json?.code !== 'SUCCESS') {
-    throw new Error(json?.message || 'Registration failed');
+  if (!response.ok || (json?.code && json.code !== 'SUCCESS')) {
+    throw new ApiError(json?.message || 'Registration failed', json?.code);
   }
   return json.data;
 }

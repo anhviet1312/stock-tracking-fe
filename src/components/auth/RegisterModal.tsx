@@ -88,7 +88,7 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1.5">Username</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1.5">Username <span className="text-rose-500">*</span></label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
                       <UserIcon className="h-4 w-4" />
@@ -105,7 +105,7 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1.5">Email</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1.5">Email <span className="text-rose-500">*</span></label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
                       <Mail className="h-4 w-4" />
@@ -122,7 +122,7 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModa
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1.5">Password</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1.5">Password <span className="text-rose-500">*</span></label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
                       <Lock className="h-4 w-4" />

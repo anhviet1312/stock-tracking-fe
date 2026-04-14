@@ -1,4 +1,4 @@
-import { Bell, Search, Menu, LogOut } from 'lucide-react';
+import { Bell, Menu, LogOut } from 'lucide-react';
 import { useAuth } from '../../lib/AuthContext';
 import { useState } from 'react';
 import { LoginModal } from '../auth/LoginModal';
@@ -15,15 +15,6 @@ export function Header() {
         <button className="md:hidden p-2 text-slate-400 hover:text-white transition-colors">
           <Menu className="w-6 h-6" />
         </button>
-        
-        <div className="hidden md:flex relative group">
-          <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-400 transition-colors" />
-          <input 
-            type="text" 
-            placeholder="Search stocks, ETFs..." 
-            className="bg-dark-900/50 border border-white/10 rounded-full py-2 pl-10 pr-4 text-sm w-64 focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/50 transition-all placeholder:text-slate-500 text-slate-200"
-          />
-        </div>
       </div>
 
       <div className="flex items-center gap-6">

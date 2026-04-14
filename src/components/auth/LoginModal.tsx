@@ -25,7 +25,13 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister }: LoginModalPr
       await login({ username, password });
       onClose();
     } catch (err: any) {
-      setError(err.message || 'Invalid username or password');
+      if (err?.code === 'resource-not-found') {
+        setError('User not found. Please check your username.');
+      } else if (err?.code === 'invalid-request') {
+        setError('Wrong password. Please try again.');
+      } else {
+        setError(err.message || 'Invalid username or password');
+      }
     } finally {
       setLoading(false);
     }
